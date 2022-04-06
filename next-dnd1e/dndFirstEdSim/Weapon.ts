@@ -1,18 +1,35 @@
 import { weapons, WeaponTypes } from "./data/weapons";
 import { diceDamageParser, WeaponDamage } from "./dice-parser";
 
-export class Weapon {
-  damageSM: WeaponDamage;
-  damageL: WeaponDamage;
+export interface WeaponSheet {
+  name: string;
+  type: WeaponTypes;
+  magicalBonus: number;
+}
+
+export class Weapon implements WeaponSheet {
+  #type: WeaponTypes = WeaponTypes.longsword;
+  damageSM: WeaponDamage = { diceString: "", dices: 0, perDice: 0, plus: 0 };
+  damageL: WeaponDamage = { diceString: "", dices: 0, perDice: 0, plus: 0 };
 
   constructor(
     public name: string,
-    public type: WeaponTypes,
-    public magicalBonus: number = 0
+    type: WeaponTypes,
+    public magicalBonus: number
   ) {
+    this.type = type;
+  }
+
+  // ensure damages are updated
+  set type(type: WeaponTypes) {
+    this.#type = type;
     const weaponInfo = weapons[type];
     this.damageSM = diceDamageParser(weaponInfo.diceStringSM);
     this.damageL = diceDamageParser(weaponInfo.diceStringL);
+  }
+
+  get type() {
+    return this.#type;
   }
 
   minDamage(isLargeTarget: boolean): number {
@@ -27,6 +44,10 @@ export class Weapon {
       ? this.damageL.dices * this.damageL.perDice + this.damageL.plus
       : this.damageSM.dices * this.damageSM.perDice + this.damageSM.plus;
     return dmg + this.magicalBonus;
+  }
+
+  damageRange(isLargeTarget: boolean): string {
+    return `${this.minDamage(isLargeTarget)}-${this.maxDamage(isLargeTarget)}`;
   }
 
   randomDamage(isLargeTarget: boolean, damageBonus: number = 0): number {
@@ -66,5 +87,27 @@ export class Weapon {
         average: this.averageDamage(true),
       },
     };
+  }
+
+  toWeaponSheet(): WeaponSheet {
+    const weaponSheet = {
+      name: this.name,
+      type: this.type,
+      magicalBonus: this.magicalBonus,
+    };
+
+    return weaponSheet;
+  }
+
+  static parseWeapon(weaponSheet: WeaponSheet): Weapon {
+    return new Weapon(
+      weaponSheet.name,
+      weaponSheet.type,
+      weaponSheet.magicalBonus
+    );
+  }
+
+  static newGenericWeapon() {
+    return new Weapon("", WeaponTypes.fist, 0);
   }
 }

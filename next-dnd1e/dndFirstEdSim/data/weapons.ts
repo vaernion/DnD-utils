@@ -15,9 +15,7 @@ interface WeaponInfo {
   acAdjustments: FixedLengthArray<9, number>;
 }
 
-type Weapons = {
-  [key in WeaponTypes]: WeaponInfo;
-};
+type Weapons = Record<WeaponTypes, WeaponInfo>;
 
 export const weapons: Weapons = {
   [WeaponTypes.longsword]: {
@@ -36,8 +34,8 @@ export const weapons: Weapons = {
     acAdjustments: [2, 2, 2, 2, 3, 3, 3, 1, 0] as const,
   },
   [WeaponTypes.fist]: {
-    diceStringSM: "1d4",
-    diceStringL: "1d4",
+    diceStringSM: "1d2",
+    diceStringL: "1d2",
     acAdjustments: [-7, -5, -3, -1, 0, 0, 2, 0, 4] as const,
   },
   [WeaponTypes.superMonkFist]: {

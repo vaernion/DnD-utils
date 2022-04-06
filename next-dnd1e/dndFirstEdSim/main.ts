@@ -1,11 +1,20 @@
 import { Character } from "./Character";
+import { CharClasses } from "./data/classes";
 import { WeaponTypes } from "./data/weapons";
 import { Weapon } from "./Weapon";
 
 let targetAc = 3;
 
 const emericSword = new Weapon("Longy McLongsword", WeaponTypes.longsword, 2);
-const emeric = new Character("Emeric spec", 7, emericSword, 1, 2, 14);
+const emeric = new Character(
+  null,
+  "Emeric spec",
+  CharClasses.fighter,
+  7,
+  1,
+  2,
+  emericSword
+);
 
 const emericAvgSM = emeric.averageAttack(targetAc, false);
 const emericAvgL = emeric.averageAttack(targetAc, true);
@@ -20,7 +29,15 @@ console.log({
 });
 
 const dunstonSword = new Weapon("Two+2", WeaponTypes.twohanded, 1);
-const dunston = new Character("Dunston spec 18/00", 7, dunstonSword, 4, 8, 14);
+const dunston = new Character(
+  null,
+  "Dunston spec 18/00",
+  CharClasses.fighter,
+  7,
+  4,
+  8,
+  dunstonSword
+);
 
 const dunstonAvgSM = dunston.averageAttack(targetAc, false);
 const dunstonAvgL = dunston.averageAttack(targetAc, true);
@@ -35,7 +52,15 @@ console.log({
 });
 
 const xavierSword = new Weapon("Longy McLongsword", WeaponTypes.longsword, 1);
-const xavier = new Character("Xavier spec 18/00", 7, xavierSword, 4, 8, 14);
+const xavier = new Character(
+  null,
+  "Xavier spec 18/00",
+  CharClasses.fighter,
+  7,
+  4,
+  8,
+  xavierSword
+);
 
 const xavierAvgSM = xavier.averageAttack(targetAc, false);
 const xavierAvgL = xavier.averageAttack(targetAc, true);
@@ -84,7 +109,15 @@ const superMonkFist = new Weapon(
   WeaponTypes.superMonkFist,
   0
 );
-const superMonk = new Character("Supermonk", 17, superMonkFist, 0, 0, 10);
+const superMonk = new Character(
+  null,
+  "Supermonk",
+  CharClasses.monk,
+  17,
+  0,
+  0,
+  superMonkFist
+);
 
 const superMonkAvgSM = superMonk.averageAttack(targetAc, false);
 // const superMonkAvgL = superMonk.averageAttack(targetAc, true);
@@ -104,12 +137,14 @@ const superFighterSword = new Weapon(
   3
 );
 const superFighter = new Character(
+  null,
   "Superfighter spec",
+  CharClasses.fighter,
   17,
-  superFighterSword,
+
   1 + 3,
   1 + 6,
-  4
+  superFighterSword
 );
 
 const superFighterAvgSM = superFighter.averageAttack(targetAc, false);
@@ -148,3 +183,5 @@ console.log({
   superFighterDmgL,
   superMonkDmg,
 });
+
+console.log(Object.getOwnPropertyNames(emericSword));

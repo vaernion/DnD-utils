@@ -1,18 +1,37 @@
+import { randomUUID } from "crypto";
+import { attackMatrix, CharClasses } from "./data/classes";
 import { weapons } from "./data/weapons";
 import { AttackResult } from "./utilTypes";
-import { Weapon } from "./Weapon";
+import { Weapon, WeaponSheet } from "./Weapon";
 
-export class Character {
-  public thac0: number;
+export type CharacterArgs = ConstructorParameters<typeof Character>;
+
+export interface CharSheet {
+  uuid: string;
+  name: string;
+  charClass: CharClasses;
+  level: number;
+  toHitBonus: number;
+  damageBonus: number;
+  weapon: WeaponSheet;
+}
+
+export class Character implements CharSheet {
+  public uuid;
+  public thac0;
   constructor(
+    uuid: string | null,
     public name: string,
+    public charClass: CharClasses,
     public level: number,
-    public weapon: Weapon,
     public toHitBonus: number,
     public damageBonus: number,
-    thac0: number
+    public weapon: Weapon
   ) {
-    this.thac0 = thac0;
+    this.uuid = uuid ? uuid : randomUUID();
+
+    const thac0MaxLevel = level > 21 ? 21 : level;
+    this.thac0 = attackMatrix[charClass][thac0MaxLevel];
   }
 
   randomAttack(targetAc: number, isLargeTarget: boolean = false): AttackResult {
@@ -70,5 +89,47 @@ export class Character {
     const acAdjustment =
       weapons[this.weapon.type].acAdjustments[constrictedAc - 2]; // adjustments start at ac 2
     return this.thac0 - targetAc - acAdjustment;
+  }
+
+  toCharSheet(): CharSheet {
+    const charSheet = {
+      uuid: this.uuid,
+      name: this.name,
+      charClass: this.charClass,
+      level: this.level,
+      toHitBonus: this.toHitBonus,
+      damageBonus: this.damageBonus,
+      // avoid nested JSON encoding
+      weapon: this.weapon.toWeaponSheet(),
+    };
+    return charSheet;
+  }
+
+  static parseCharacterSheet(charSheet: CharSheet): Character {
+    return new Character(
+      charSheet.uuid,
+      charSheet.name,
+      charSheet.charClass,
+      charSheet.level,
+      charSheet.toHitBonus,
+      charSheet.damageBonus,
+      new Weapon(
+        charSheet.weapon.name,
+        charSheet.weapon.type,
+        charSheet.weapon.magicalBonus
+      )
+    );
+  }
+
+  static newGenericChar(uuid?: string) {
+    return new Character(
+      uuid ? uuid : null,
+      "",
+      CharClasses.fighter,
+      0,
+      0,
+      0,
+      Weapon.newGenericWeapon()
+    );
   }
 }
