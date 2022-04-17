@@ -1,70 +1,62 @@
-import {
-  ChangeEvent,
-  FunctionComponent,
-  useEffect,
-  useReducer,
-  useRef,
-} from "react";
+import Link from "next/link";
+import { ChangeEvent, FC, useEffect, useRef } from "react";
 import { Character, CharSheet } from "../dndFirstEdSim/Character";
 import { CharClasses } from "../dndFirstEdSim/data/classes";
 import { weapons } from "../dndFirstEdSim/data/weapons";
-import { Weapon } from "../dndFirstEdSim/Weapon";
-import { CharActionsEnum, charReducer } from "../reducers/charReducer";
-import styles from "../styles/Home.module.css";
+import { CharEditType } from "../reducers/charEditReducer";
+import { CharStoreType } from "../reducers/charStoreReducer";
+import styles from "../styles/Layout.module.css";
 import {
   deleteCharInLocalStorage,
   saveCharToLocalStorage,
 } from "../utils/storage";
+import { useCharStore } from "./charStore";
 
 interface Props {
   charSheet: CharSheet;
-  removeCharFromList: (uuid: string) => void;
 }
 
-export const CharEditor: FunctionComponent<Props> = ({
-  charSheet,
-  removeCharFromList,
-}) => {
-  const [charState, charDispatch] = useReducer(
-    charReducer,
-    new Character(
-      charSheet.uuid,
-      charSheet.name,
-      charSheet.charClass,
-      charSheet.level,
-      charSheet.toHitBonus,
-      charSheet.damageBonus,
-      new Weapon(
-        charSheet.weapon.name,
-        charSheet.weapon.type,
-        charSheet.weapon.magicalBonus
-      )
-    )
-  );
+export const CharEditor: FC<Props> = ({ charSheet }) => {
+  const { dispatch } = useCharStore();
+  // const character = useMemo(
+  //   () => Character.parseCharacterSheet(charSheet),
+  //   [charSheet]
+  // );
+  // class instance so metods can be used for view
+  const character = Character.parseCharacterSheet(charSheet);
 
   const dialogRef = useRef<any>(null);
 
   useEffect(() => {
-    saveCharToLocalStorage(charState);
-  }, [charState]);
+    saveCharToLocalStorage(charSheet);
+  }, [charSheet]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const type = e.currentTarget.name as CharActionsEnum;
-    let value: any =
+    const editType = e.currentTarget.name as CharEditType;
+    let editValue: any =
       e.currentTarget.type === "number"
         ? Number(e.currentTarget.value)
         : e.currentTarget.value;
 
-    if (typeof value === "number" && value < 0) value = 0;
+    if (typeof editValue === "number" && editValue < 0) editValue = 0;
 
-    charDispatch({ type, value });
+    dispatch({
+      type: CharStoreType.EDIT_CHAR,
+      value: {
+        charSheet,
+        charEditAction: { type: editType, value: editValue },
+      },
+    });
   };
 
   const deleteChar = () => {
-    deleteCharInLocalStorage(charState.uuid);
-    removeCharFromList(charState.uuid);
+    deleteCharInLocalStorage(charSheet.uuid);
+    dispatch({
+      type: CharStoreType.DELETE_CHAR,
+      value: { uuid: charSheet.uuid },
+    });
   };
 
   const showDeleteDialog = () => {
@@ -97,22 +89,22 @@ export const CharEditor: FunctionComponent<Props> = ({
         }
       `}</style>
       <div className={styles.card}>
-        <div>uuid: {charState.uuid}</div>
+        <div>uuid: {character.uuid}</div>
 
         <div>
-          <label htmlFor={CharActionsEnum.SET_CHAR_NAME}>name: </label>
+          <label htmlFor={CharEditType.SET_CHAR_NAME}>name: </label>
           <input
-            name={CharActionsEnum.SET_CHAR_NAME}
+            name={CharEditType.SET_CHAR_NAME}
             type="text"
-            value={charState.name}
+            value={character.name}
             onChange={handleChange}
           />
         </div>
 
         <div>
           <select
-            name={CharActionsEnum.SET_CHAR_CLASS}
-            value={charState.charClass}
+            name={CharEditType.SET_CHAR_CLASS}
+            value={character.charClass}
             onChange={handleChange}
           >
             {Object.entries(CharClasses).map(([name, nameLong], i) => (
@@ -124,23 +116,23 @@ export const CharEditor: FunctionComponent<Props> = ({
         </div>
 
         <div>
-          <label htmlFor={CharActionsEnum.SET_CHAR_LEVEL}>level: </label>
+          <label htmlFor={CharEditType.SET_CHAR_LEVEL}>level: </label>
           <input
-            name={CharActionsEnum.SET_CHAR_LEVEL}
-            id={CharActionsEnum.SET_CHAR_LEVEL}
+            name={CharEditType.SET_CHAR_LEVEL}
+            id={CharEditType.SET_CHAR_LEVEL}
             type="number"
-            value={charState.level}
+            value={character.level}
             onChange={handleChange}
             style={{ width: "3rem" }}
           />
         </div>
 
-        <div>thac0: {charState.thac0}</div>
+        <div>thac0: {character.thac0}</div>
 
         <div>
           <select
-            name={CharActionsEnum.SET_WEAPON_TYPE}
-            value={charState.weapon.type}
+            name={CharEditType.SET_WEAPON_TYPE}
+            value={character.weapon.type}
             onChange={handleChange}
           >
             {Object.entries(weapons).map(([name, weapon], i) => (
@@ -155,21 +147,21 @@ export const CharEditor: FunctionComponent<Props> = ({
         <div>
           <div>weapon:</div>
           <input
-            name={CharActionsEnum.SET_WEAPON_NAME}
+            name={CharEditType.SET_WEAPON_NAME}
             type="text"
-            value={charState.weapon.name}
+            value={character.weapon.name}
             onChange={handleChange}
           />
         </div>
 
         <div>
-          <label htmlFor={CharActionsEnum.SET_WEAPON_MAGIC_BONUS}>
+          <label htmlFor={CharEditType.SET_WEAPON_MAGIC_BONUS}>
             magic-bonus:{" "}
           </label>
           <input
-            name={CharActionsEnum.SET_WEAPON_MAGIC_BONUS}
+            name={CharEditType.SET_WEAPON_MAGIC_BONUS}
             type="number"
-            value={charState.weapon.magicalBonus}
+            value={character.weapon.magicalBonus}
             onChange={handleChange}
             style={{ width: "3rem" }}
           />
@@ -178,8 +170,8 @@ export const CharEditor: FunctionComponent<Props> = ({
         <div>
           weaponDmg:
           <div>
-            S/M: {charState.weapon.damageRange(false)} L:{" "}
-            {charState.weapon.damageRange(true)}
+            S/M: {character.weapon.damageRange(false)} L:{" "}
+            {character.weapon.damageRange(true)}
           </div>
         </div>
 
@@ -187,7 +179,7 @@ export const CharEditor: FunctionComponent<Props> = ({
           {/* <button onClick={saveChar}>Save</button> */}
           <dialog ref={dialogRef}>
             <form method="dialog">
-              <div>Delete character {charState.name}?</div>
+              <div>Delete character {character.name}?</div>
               <div>
                 <button className="btn-primary" value="cancel">
                   Cancel
@@ -202,6 +194,11 @@ export const CharEditor: FunctionComponent<Props> = ({
               </div>
             </form>
           </dialog>
+          <Link
+            href={{ pathname: "/damage", query: { charId: character.uuid } }}
+          >
+            <a>Damage stats</a>
+          </Link>
           <button onClick={showDeleteDialog}>Delete</button>
         </div>
       </div>

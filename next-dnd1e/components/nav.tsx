@@ -1,18 +1,21 @@
-/*  ./components/Navbar.jsx     */
-
-import { NextComponentType } from "next";
 import Link from "next/link";
+import { FC } from "react";
 
-export const Navbar: NextComponentType = () => {
+const menuItems: [href: string, name: string][] = [
+  ["/", "Home1"],
+  ["/stuff", "stuff"],
+  ["/damage", "Damage"],
+];
+
+export const Navbar: FC = () => {
   return (
     <>
       <nav className="">
-        <Link href="/">
-          <a>Home1</a>
-        </Link>
-        <Link href="/stuff">
-          <a>stuff</a>
-        </Link>
+        {menuItems.map((item, idx) => (
+          <Link key={idx} href={item[0]}>
+            <a>{item[1]}</a>
+          </Link>
+        ))}
       </nav>
     </>
   );

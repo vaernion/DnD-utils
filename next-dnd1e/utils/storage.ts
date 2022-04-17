@@ -1,9 +1,10 @@
-import { Character, CharSheet } from "../dndFirstEdSim/Character";
+import { CharSheet } from "../dndFirstEdSim/Character";
 
 const charsKey = "chars";
 
-export const saveCharToLocalStorage = (charToSave: Character) => {
-  let currentChars: Character[] = [];
+export const saveCharToLocalStorage = (charToSave: CharSheet) => {
+  console.count("saving " + charToSave.uuid);
+  let currentChars: CharSheet[] = [];
   try {
     const currentCharsJSON = localStorage.getItem(charsKey);
 
@@ -12,9 +13,7 @@ export const saveCharToLocalStorage = (charToSave: Character) => {
       try {
         const charsParsed: CharSheet[] = JSON.parse(currentCharsJSON);
         if (Array.isArray(charsParsed)) {
-          currentChars = charsParsed.map((char) =>
-            Character.parseCharacterSheet(char)
-          );
+          currentChars = charsParsed;
         }
       } catch (err) {
         // invalid data stored, clean up
@@ -27,14 +26,12 @@ export const saveCharToLocalStorage = (charToSave: Character) => {
 
     // prevent duplicates, newest will overwrite older with same name
     // TODO: unique ids per char, useId not usable in nextjs yet
-    const charsMap: Map<string, Character> = new Map();
+    const charsMap: Map<string, CharSheet> = new Map();
     for (const char of currentChars) {
       charsMap.set(char.uuid, char);
     }
     const charsUnique = Array.from(charsMap.values());
-
-    const charSheets = charsUnique.map((char) => char.toCharSheet());
-    const updatedCharsJSON = JSON.stringify(charSheets);
+    const updatedCharsJSON = JSON.stringify(charsUnique);
 
     // saving
     localStorage.setItem(charsKey, updatedCharsJSON);
@@ -43,8 +40,8 @@ export const saveCharToLocalStorage = (charToSave: Character) => {
   }
 };
 
-export const loadCharsFromLocalStorage = (): Character[] => {
-  let chars: Character[] = [];
+export const loadCharsFromLocalStorage = (): CharSheet[] => {
+  let chars: CharSheet[] = [];
   try {
     const charsJSON = localStorage.getItem(charsKey);
 
@@ -52,9 +49,7 @@ export const loadCharsFromLocalStorage = (): Character[] => {
       try {
         const charsParsed = JSON.parse(charsJSON);
         if (Array.isArray(charsParsed)) {
-          chars = charsParsed.map((charSheet) =>
-            Character.parseCharacterSheet(charSheet)
-          );
+          chars = charsParsed;
         }
       } catch (err) {
         // invalid data stored, clean up
@@ -69,8 +64,15 @@ export const loadCharsFromLocalStorage = (): Character[] => {
   return chars;
 };
 
+export const loadSingleCharFromLocalStorage = (
+  uuid: string
+): CharSheet | null => {
+  let char = loadCharsFromLocalStorage().find((char) => char.uuid === uuid);
+  return char ? char : null;
+};
+
 export const deleteCharInLocalStorage = (uuid: string) => {
-  let currentChars: Character[] = [];
+  let currentChars: CharSheet[] = [];
   try {
     const currentCharsJSON = localStorage.getItem(charsKey);
 
@@ -79,9 +81,7 @@ export const deleteCharInLocalStorage = (uuid: string) => {
       try {
         const charsParsed: CharSheet[] = JSON.parse(currentCharsJSON);
         if (Array.isArray(charsParsed)) {
-          currentChars = charsParsed.map((char) =>
-            Character.parseCharacterSheet(char)
-          );
+          currentChars = charsParsed;
         }
       } catch (err) {
         // invalid data stored, clean up
@@ -90,11 +90,9 @@ export const deleteCharInLocalStorage = (uuid: string) => {
       }
     }
 
-    // delete char with given uuid
-    const newChars = currentChars.filter((char) => char.uuid !== uuid);
-
-    const charSheets = newChars.map((char) => char.toCharSheet());
-    const updatedCharsJSON = JSON.stringify(charSheets);
+    // remove char with given uuid
+    const filteredChars = currentChars.filter((char) => char.uuid !== uuid);
+    const updatedCharsJSON = JSON.stringify(filteredChars);
 
     // saving
     localStorage.setItem(charsKey, updatedCharsJSON);

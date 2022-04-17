@@ -1,31 +1,27 @@
 import Head from "next/head";
-import React, {
-  FunctionComponent,
-  MouseEvent,
-  useEffect,
-  useState,
-} from "react";
+import React, { FC, useEffect } from "react";
 import { Character } from "../dndFirstEdSim/Character";
-import styles from "../styles/Home.module.css";
+import { CharStoreType } from "../reducers/charStoreReducer";
+import styles from "../styles/Layout.module.css";
 import { loadCharsFromLocalStorage } from "../utils/storage";
+import { useCharStore } from "./charStore";
 import { CharEditor } from "./dndCharEditor";
 
-export const CharList: FunctionComponent = () => {
-  const [charList, setCharList] = useState<Character[]>([]);
+export const CharList: FC = () => {
+  const { state, dispatch } = useCharStore();
 
   useEffect(() => {
-    setCharList(loadCharsFromLocalStorage());
-  }, []);
+    dispatch({
+      type: CharStoreType.LOAD_CHARS,
+      value: loadCharsFromLocalStorage(),
+    });
+  }, [dispatch]);
 
-  console.log({ charList });
-
-  const addChar = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setCharList((s) => [...s, Character.newGenericChar(crypto.randomUUID())]);
-  };
-
-  const removeCharFromList = (uuid: string) => {
-    setCharList((s) => s.filter((char) => char.uuid !== uuid));
+  const handleAddChar = () => {
+    dispatch({
+      type: CharStoreType.ADD_CHAR,
+      value: Character.newGenericChar(crypto.randomUUID()).toCharSheet(),
+    });
   };
 
   return (
@@ -33,22 +29,18 @@ export const CharList: FunctionComponent = () => {
       <Head>
         <title>D&D 1e utils</title>
       </Head>
-      <main className={styles.main}>
-        <h1 className={styles.title}>D&D 1e damage sim</h1>
 
-        <div className={styles.grid}>
-          {charList.map((char) => (
-            <CharEditor
-              key={char.uuid}
-              charSheet={char.toCharSheet()}
-              removeCharFromList={removeCharFromList}
-            />
-          ))}
-        </div>
-        <div>
-          <button onClick={addChar}>new char</button>
-        </div>
-      </main>
+      <h1 className={styles.title}>D&D 1e damage sim</h1>
+
+      <div className={styles.controls}>
+        <button onClick={handleAddChar}>new char</button>
+      </div>
+
+      <div className={styles.grid}>
+        {state.map((char) => (
+          <CharEditor key={char.uuid} charSheet={char} />
+        ))}
+      </div>
     </>
   );
 };
