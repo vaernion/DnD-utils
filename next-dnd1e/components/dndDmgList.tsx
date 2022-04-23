@@ -1,23 +1,31 @@
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { Character, CharSheet } from "../dndFirstEdSim/Character";
 import styles from "../styles/Layout.module.css";
 
-const SIMULATIONS = 1_000;
+const SIMULATIONS = 10_000;
 
 interface Props {
   charSheet: CharSheet;
 }
 
 export const DamageList: FC<Props> = ({ charSheet }) => {
-  const character = Character.parseCharacterSheet(charSheet);
+  const character = useMemo(
+    () => Character.parseCharacterSheet(charSheet),
+    [charSheet]
+  );
 
-  const avgDamageVsAcs = new Array(21)
-    .fill(null)
-    .map((_, idx) => ({
-      sm: character.averageAttack(idx - 10, false, SIMULATIONS),
-      l: character.averageAttack(idx - 10, true, SIMULATIONS),
-    }))
-    .reverse();
+  // prevent expensive simulation reruns on edits of other chars
+  const avgDamageVsAcs = useMemo(
+    () =>
+      new Array(21)
+        .fill(null)
+        .map((_, idx) => ({
+          sm: character.averageAttack(idx - 10, false, SIMULATIONS),
+          l: character.averageAttack(idx - 10, true, SIMULATIONS),
+        }))
+        .reverse(),
+    [character]
+  );
 
   return (
     <>
