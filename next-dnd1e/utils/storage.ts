@@ -3,7 +3,7 @@ import { CharSheet } from "../dndFirstEdSim/Character";
 const charsKey = "chars";
 
 export const saveCharToLocalStorage = (charToSave: CharSheet) => {
-  console.count("saving " + charToSave.uuid);
+  // console.count("saving " + charToSave.uuid);
   let currentChars: CharSheet[] = [];
   try {
     const currentCharsJSON = localStorage.getItem(charsKey);

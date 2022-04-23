@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChangeEvent, FC, useEffect, useRef } from "react";
+import { ChangeEvent, FC, useEffect, useMemo, useRef } from "react";
 import { Character, CharSheet } from "../dndFirstEdSim/Character";
 import { CharClasses } from "../dndFirstEdSim/data/classes";
 import { weapons } from "../dndFirstEdSim/data/weapons";
@@ -14,22 +14,26 @@ import { useCharStore } from "./charStore";
 
 interface Props {
   charSheet: CharSheet;
+  readOnly?: boolean;
 }
 
-export const CharEditor: FC<Props> = ({ charSheet }) => {
+export const CharEditor: FC<Props> = ({ charSheet, readOnly = false }) => {
   const { dispatch } = useCharStore();
-  // const character = useMemo(
-  //   () => Character.parseCharacterSheet(charSheet),
-  //   [charSheet]
-  // );
-  // class instance so metods can be used for view
-  const character = Character.parseCharacterSheet(charSheet);
 
+  // class instance so metods can be used for view
+  const character = useMemo(
+    () => Character.parseCharacterSheet(charSheet),
+    [charSheet]
+  );
+
+  // HTMLDialogElement marked as deprecated by TS
   const dialogRef = useRef<any>(null);
 
+  // save on each edit
   useEffect(() => {
+    if (readOnly) return;
     saveCharToLocalStorage(charSheet);
-  }, [charSheet]);
+  }, [charSheet, readOnly]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -40,6 +44,7 @@ export const CharEditor: FC<Props> = ({ charSheet }) => {
         ? Number(e.currentTarget.value)
         : e.currentTarget.value;
 
+    // prevent negative values
     if (typeof editValue === "number" && editValue < 0) editValue = 0;
 
     dispatch({
@@ -89,7 +94,7 @@ export const CharEditor: FC<Props> = ({ charSheet }) => {
         }
       `}</style>
       <div className={styles.card}>
-        <div>uuid: {character.uuid}</div>
+        {/* <div>uuid: {character.uuid}</div> */}
 
         <div>
           <label htmlFor={CharEditType.SET_CHAR_NAME}>name: </label>
@@ -98,42 +103,76 @@ export const CharEditor: FC<Props> = ({ charSheet }) => {
             type="text"
             value={character.name}
             onChange={handleChange}
+            disabled={readOnly}
           />
         </div>
 
         <div>
-          <select
-            name={CharEditType.SET_CHAR_CLASS}
-            value={character.charClass}
-            onChange={handleChange}
-          >
-            {Object.entries(CharClasses).map(([name, nameLong], i) => (
-              <option key={name} value={nameLong}>
-                {nameLong}
-              </option>
-            ))}
-          </select>
+          <span>
+            <select
+              name={CharEditType.SET_CHAR_CLASS}
+              value={character.charClass}
+              onChange={handleChange}
+              disabled={readOnly}
+            >
+              {Object.entries(CharClasses).map(([name, nameLong], i) => (
+                <option key={name} value={nameLong}>
+                  {nameLong}
+                </option>
+              ))}
+            </select>
+          </span>
+
+          <span>
+            <label htmlFor={CharEditType.SET_CHAR_LEVEL}>level: </label>
+            <input
+              name={CharEditType.SET_CHAR_LEVEL}
+              id={CharEditType.SET_CHAR_LEVEL}
+              type="number"
+              value={character.level}
+              onChange={handleChange}
+              disabled={readOnly}
+              style={{ width: "3rem" }}
+            />
+          </span>
+
+          <span>thac0: {character.thac0}</span>
         </div>
 
         <div>
-          <label htmlFor={CharEditType.SET_CHAR_LEVEL}>level: </label>
-          <input
-            name={CharEditType.SET_CHAR_LEVEL}
-            id={CharEditType.SET_CHAR_LEVEL}
-            type="number"
-            value={character.level}
-            onChange={handleChange}
-            style={{ width: "3rem" }}
-          />
-        </div>
+          <span>
+            <label htmlFor={CharEditType.SET_CHAR_TOHIT_BONUS}>tohit+: </label>
+            <input
+              name={CharEditType.SET_CHAR_TOHIT_BONUS}
+              type="number"
+              value={character.toHitBonus}
+              onChange={handleChange}
+              disabled={readOnly}
+              style={{ width: "3rem" }}
+            />
+          </span>
 
-        <div>thac0: {character.thac0}</div>
+          <span>
+            <label htmlFor={CharEditType.SET_CHAR_DAMAGE_BONUS}>
+              damage+:{" "}
+            </label>
+            <input
+              name={CharEditType.SET_CHAR_DAMAGE_BONUS}
+              type="number"
+              value={character.damageBonus}
+              onChange={handleChange}
+              disabled={readOnly}
+              style={{ width: "3rem" }}
+            />
+          </span>
+        </div>
 
         <div>
           <select
             name={CharEditType.SET_WEAPON_TYPE}
             value={character.weapon.type}
             onChange={handleChange}
+            disabled={readOnly}
           >
             {Object.entries(weapons).map(([name, weapon], i) => (
               <option key={name} value={name}>
@@ -145,34 +184,34 @@ export const CharEditor: FC<Props> = ({ charSheet }) => {
         </div>
 
         <div>
-          <div>weapon:</div>
+          <label htmlFor={CharEditType.SET_WEAPON_NAME}>weapon:</label>
           <input
             name={CharEditType.SET_WEAPON_NAME}
             type="text"
             value={character.weapon.name}
             onChange={handleChange}
+            disabled={readOnly}
           />
         </div>
 
         <div>
-          <label htmlFor={CharEditType.SET_WEAPON_MAGIC_BONUS}>
-            magic-bonus:{" "}
-          </label>
+          <label htmlFor={CharEditType.SET_WEAPON_MAGIC_BONUS}>magic+: </label>
           <input
             name={CharEditType.SET_WEAPON_MAGIC_BONUS}
             type="number"
             value={character.weapon.magicalBonus}
             onChange={handleChange}
+            disabled={readOnly}
             style={{ width: "3rem" }}
           />
         </div>
 
         <div>
-          weaponDmg:
-          <div>
+          <span>damage: </span>
+          <span>
             S/M: {character.weapon.damageRange(false)} L:{" "}
             {character.weapon.damageRange(true)}
-          </div>
+          </span>
         </div>
 
         <div>
@@ -199,7 +238,9 @@ export const CharEditor: FC<Props> = ({ charSheet }) => {
           >
             <a>Damage stats</a>
           </Link>
-          <button onClick={showDeleteDialog}>Delete</button>
+          <button onClick={showDeleteDialog} disabled={readOnly}>
+            Delete
+          </button>
         </div>
       </div>
     </>

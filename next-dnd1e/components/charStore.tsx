@@ -1,9 +1,11 @@
-import { createContext, FC, useContext, useReducer } from "react";
+import { createContext, FC, useContext, useEffect, useReducer } from "react";
 import { CharSheet } from "../dndFirstEdSim/Character";
 import {
   CharStoreAction,
   charStoreReducer,
+  CharStoreType,
 } from "../reducers/charStoreReducer";
+import { loadCharsFromLocalStorage } from "../utils/storage";
 
 const CharStoreContext = createContext<{
   state: CharSheet[];
@@ -17,6 +19,13 @@ export const useCharStore = () => useContext(CharStoreContext);
 
 export const CharStore: FC = ({ children }) => {
   const [state, dispatch] = useReducer(charStoreReducer, []);
+
+  useEffect(() => {
+    dispatch({
+      type: CharStoreType.LOAD_CHARS,
+      value: loadCharsFromLocalStorage(),
+    });
+  }, []);
 
   return (
     <>

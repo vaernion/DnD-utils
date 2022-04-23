@@ -1,21 +1,13 @@
 import Head from "next/head";
-import React, { FC, useEffect } from "react";
+import React, { FC } from "react";
 import { Character } from "../dndFirstEdSim/Character";
 import { CharStoreType } from "../reducers/charStoreReducer";
 import styles from "../styles/Layout.module.css";
-import { loadCharsFromLocalStorage } from "../utils/storage";
 import { useCharStore } from "./charStore";
 import { CharEditor } from "./dndCharEditor";
 
 export const CharList: FC = () => {
   const { state, dispatch } = useCharStore();
-
-  useEffect(() => {
-    dispatch({
-      type: CharStoreType.LOAD_CHARS,
-      value: loadCharsFromLocalStorage(),
-    });
-  }, [dispatch]);
 
   const handleAddChar = () => {
     dispatch({

@@ -78,7 +78,7 @@ export class Character implements CharSheet {
       hitrate: hits / simulations,
       crits,
       averageDamageAll: damageSum / simulations,
-      averageDamageHits: damageSum / hits,
+      averageDamageHits: damageSum / (hits > 0 ? hits : 1),
       lastAttack,
     };
     return result;

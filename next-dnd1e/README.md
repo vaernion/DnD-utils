@@ -12,7 +12,7 @@ Created to settle comparisons and have fun exploring possibilities for character
 | GUI: create character |                                              | :heavy_check_mark: |
 | GUI: create weapon    |                                              | :heavy_check_mark: |
 | Persist char(s)       | serialize char/weapon in localstorage        | :heavy_check_mark: |
-| GUI: compare chars    |                                              |                    |
+| GUI: compare chars    |                                              | :heavy_check_mark: |
 | Character equipment   | char should dynamically parse affected stats |                    |
 | Char buffs            | spells, potions                              |                    |
 | round based combat    |                                              |                    |
