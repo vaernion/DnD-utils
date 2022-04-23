@@ -15,7 +15,7 @@ export const DamageList: FC<Props> = ({ charSheet }) => {
     .fill(null)
     .map((_, idx) => ({
       sm: character.averageAttack(idx - 10, false, SIMULATIONS),
-      l: character.averageAttack(idx - 10, false, SIMULATIONS),
+      l: character.averageAttack(idx - 10, true, SIMULATIONS),
     }))
     .reverse();
 

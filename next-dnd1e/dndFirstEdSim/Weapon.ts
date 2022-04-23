@@ -50,7 +50,7 @@ export class Weapon implements WeaponSheet {
     return `${this.minDamage(isLargeTarget)}-${this.maxDamage(isLargeTarget)}`;
   }
 
-  randomDamage(isLargeTarget: boolean, damageBonus: number = 0): number {
+  randomDamage(isLargeTarget: boolean, charDamageBonus: number = 0): number {
     let totalDmg = isLargeTarget ? this.damageL.plus : this.damageSM.plus;
     const dices = isLargeTarget ? this.damageL.dices : this.damageSM.dices;
     const perDice = isLargeTarget
@@ -61,7 +61,7 @@ export class Weapon implements WeaponSheet {
       let rngDmg = Math.ceil(Math.random() * perDice);
       totalDmg += rngDmg;
     }
-    return totalDmg + this.magicalBonus;
+    return totalDmg + this.magicalBonus + charDamageBonus;
   }
 
   averageDamage(isLargeTarget: boolean, simulations: number = 100_000) {
