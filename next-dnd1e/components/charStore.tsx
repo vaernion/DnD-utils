@@ -1,4 +1,11 @@
-import { createContext, FC, useContext, useEffect, useReducer } from "react";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
 import { CharSheet } from "../dndFirstEdSim/Character";
 import {
   CharStoreAction,
@@ -17,7 +24,11 @@ const CharStoreContext = createContext<{
 
 export const useCharStore = () => useContext(CharStoreContext);
 
-export const CharStore: FC = ({ children }) => {
+type Props = {
+  children: ReactNode;
+};
+
+export const CharStore: FC<Props> = ({ children }) => {
   const [state, dispatch] = useReducer(charStoreReducer, []);
 
   useEffect(() => {

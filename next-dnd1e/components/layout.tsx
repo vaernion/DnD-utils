@@ -1,8 +1,12 @@
-import { FC } from "react";
+import { FC, ReactNode } from "react";
 import styles from "../styles/Layout.module.css";
 import { Navbar } from "./nav";
 
-export const Layout: FC = ({ children }) => {
+type Props = {
+  children: ReactNode;
+};
+
+export const Layout: FC<Props> = ({ children }) => {
   return (
     <>
       <div className={styles.page}>
