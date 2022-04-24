@@ -11,7 +11,7 @@ export const Layout: FC<Props> = ({ children }) => {
     <>
       <div className={styles.page}>
         <Navbar />
-        <main className={styles.container}>{children}</main>
+        <main className={styles.content}>{children}</main>
         <Footer />
       </div>
     </>

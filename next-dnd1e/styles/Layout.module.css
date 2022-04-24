@@ -3,13 +3,28 @@
 }
 
 .page {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 100vh;
+  padding: 4rem 0;
+}
+
+.navbar {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
+}
+
+.navbar a {
+  font-size: x-large;
+  margin: 1rem;
+}
+
+.content {
+  padding-bottom: 3rem;
 }
 
 .controls {
@@ -21,11 +36,14 @@
 
 .footer {
   display: flex;
-  flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
   justify-content: center;
   align-items: center;
+  padding: 1rem 0;
+  border-top: 2px solid #eaeaea;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 2.5rem;
 }
 
 .footer a {

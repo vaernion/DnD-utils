@@ -2,13 +2,13 @@ import { NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { ChangeEvent, useState } from "react";
+import { AutoBattler } from "../components/AutoBattler";
 import { CharSelect } from "../components/CharSelect";
 import { useCharStore } from "../components/charStore";
 import { CharEditor } from "../components/dndCharEditor";
-import { DamageList } from "../components/dndDmgList";
 import styles from "../styles/Layout.module.css";
 
-const DamagePage: NextPage = () => {
+const BattlePage: NextPage = () => {
   const router = useRouter();
   const { state } = useCharStore();
 
@@ -48,7 +48,7 @@ const DamagePage: NextPage = () => {
         />
 
         <CharSelect
-          label="Compare with"
+          label="Opponent"
           activeCharId={compareCharId}
           onCharChange={handleCompareCharChange}
           charFilter={(char) => char.uuid !== charId}
@@ -62,12 +62,13 @@ const DamagePage: NextPage = () => {
         )}
       </div>
 
-      <div className={styles.grid}>
-        {charSheet && <DamageList charSheet={charSheet} />}
-        {charSheetCompare && <DamageList charSheet={charSheetCompare} />}
+      <div className={styles.container}>
+        {charSheet && charSheetCompare && (
+          <AutoBattler charSheet={charSheet} opponentSheet={charSheetCompare} />
+        )}
       </div>
     </>
   );
 };
 
-export default DamagePage;
+export default BattlePage;
