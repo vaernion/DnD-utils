@@ -2,8 +2,7 @@ import Link from "next/link";
 import { FC } from "react";
 
 const menuItems: [href: string, name: string][] = [
-  ["/", "Home1"],
-  ["/stuff", "stuff"],
+  ["/", "Home"],
   ["/damage", "Damage"],
 ];
 

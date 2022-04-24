@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { ChangeEvent, useState } from "react";
 import { useCharStore } from "../components/charStore";
@@ -30,6 +31,10 @@ const DamageView: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>Damage{charSheet ? ` - ${charSheet.name}` : ""}</title>
+      </Head>
+
       <div className={styles.controls}>
         <label htmlFor="currentChar">Character:</label>
         <select

@@ -1,4 +1,3 @@
-import Head from "next/head";
 import React, { FC } from "react";
 import { Character } from "../dndFirstEdSim/Character";
 import { CharStoreType } from "../reducers/charStoreReducer";
@@ -18,12 +17,6 @@ export const CharList: FC = () => {
 
   return (
     <>
-      <Head>
-        <title>D&D 1e utils</title>
-      </Head>
-
-      <h1 className={styles.title}>D&D 1e damage sim</h1>
-
       <div className={styles.controls}>
         <button onClick={handleAddChar}>new char</button>
       </div>
