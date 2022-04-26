@@ -1,6 +1,24 @@
 import { weapons, WeaponTypes } from "./data/weapons";
 import { diceDamageParser, WeaponDamage } from "./dice-parser";
 
+export interface RandomDamage {
+  sum: number;
+  weaponBonus: number;
+  charBonus: number;
+  rolls: number[];
+  weaponDamage: WeaponDamage;
+}
+
+export interface AttackResult {
+  targetAc: number;
+  toHitNeeded: number;
+  roll: number;
+  attack: number;
+  isHit: boolean;
+  isCrit: boolean;
+  damage: RandomDamage | null;
+}
+
 export interface WeaponSheet {
   name: string;
   type: WeaponTypes;
@@ -50,24 +68,40 @@ export class Weapon implements WeaponSheet {
     return `${this.minDamage(isLargeTarget)}-${this.maxDamage(isLargeTarget)}`;
   }
 
-  randomDamage(isLargeTarget: boolean, charDamageBonus: number = 0): number {
-    let totalDmg = isLargeTarget ? this.damageL.plus : this.damageSM.plus;
-    const dices = isLargeTarget ? this.damageL.dices : this.damageSM.dices;
-    const perDice = isLargeTarget
-      ? this.damageL.perDice
-      : this.damageSM.perDice;
+  randomDamage(
+    isLargeTarget: boolean,
+    charDamageBonus: number = 0
+  ): RandomDamage {
+    const weaponDamage = isLargeTarget ? this.damageL : this.damageSM;
+    const dices = weaponDamage.dices;
+    const perDice = weaponDamage.perDice;
+
+    let totalDmg = weaponDamage.plus;
+    const dicesRolled: number[] = [];
 
     for (let i = 0; i < dices; i++) {
-      let rngDmg = Math.ceil(Math.random() * perDice);
+      const rngDmg = 1 + Math.floor(Math.random() * perDice);
       totalDmg += rngDmg;
+      dicesRolled.push(rngDmg);
     }
-    return totalDmg + this.magicalBonus + charDamageBonus;
+
+    const sum = totalDmg + this.magicalBonus + charDamageBonus;
+
+    const result: RandomDamage = {
+      sum,
+      weaponBonus: this.magicalBonus,
+      charBonus: charDamageBonus,
+      rolls: dicesRolled,
+      weaponDamage,
+    };
+
+    return result;
   }
 
   averageDamage(isLargeTarget: boolean, simulations: number = 100_000) {
     let sum = 0;
     for (let i = 0; i < simulations; i++) {
-      sum += this.randomDamage(isLargeTarget);
+      sum += this.randomDamage(isLargeTarget).sum;
     }
     return sum / simulations;
   }

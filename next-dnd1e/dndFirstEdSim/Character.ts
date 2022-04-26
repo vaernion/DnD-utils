@@ -1,8 +1,7 @@
-import { randomUUID } from "crypto";
+import { v4 as randomUUID } from "uuid";
 import { attackMatrix, CharClasses } from "./data/classes";
 import { weapons } from "./data/weapons";
-import { AttackResult } from "./utilTypes";
-import { Weapon, WeaponSheet } from "./Weapon";
+import { AttackResult, Weapon, WeaponSheet } from "./Weapon";
 
 export type CharacterArgs = ConstructorParameters<typeof Character>;
 
@@ -11,6 +10,8 @@ export interface CharSheet {
   name: string;
   charClass: CharClasses;
   level: number;
+  hp: number;
+  ac: number;
   toHitBonus: number;
   damageBonus: number;
   weapon: WeaponSheet;
@@ -19,14 +20,18 @@ export interface CharSheet {
 export class Character implements CharSheet {
   public uuid;
   public thac0;
+
   constructor(
     uuid: string | null,
     public name: string,
     public charClass: CharClasses,
     public level: number,
+    public hp: number,
+    public ac: number,
     public toHitBonus: number,
     public damageBonus: number,
-    public weapon: Weapon
+    public weapon: Weapon,
+    public isLarge: boolean = false
   ) {
     this.uuid = uuid ? uuid : randomUUID();
 
@@ -36,18 +41,27 @@ export class Character implements CharSheet {
 
   randomAttack(targetAc: number, isLargeTarget: boolean = false): AttackResult {
     const toHitNeeded = this.toHitNeeded(targetAc);
-    const roll = Math.ceil(Math.random() * 20);
+    const roll = 1 + Math.floor(Math.random() * 20);
     const attack = roll + this.toHitBonus + this.weapon.magicalBonus;
 
     const isHit = attack >= toHitNeeded;
-    let damage = isHit
-      ? this.weapon.randomDamage(isLargeTarget, this.damageBonus)
-      : 0;
+    const randomDamage = this.weapon.randomDamage(
+      isLargeTarget,
+      this.damageBonus
+    );
 
     const isCrit = roll === 20;
-    if (isCrit) damage *= 2;
+    if (isCrit) randomDamage.sum *= 2;
 
-    return { targetAc, toHitNeeded, roll, attack, isHit, isCrit, damage };
+    return {
+      targetAc,
+      toHitNeeded,
+      roll,
+      attack,
+      isHit,
+      isCrit,
+      damage: isHit ? randomDamage : null,
+    };
   }
 
   averageAttack(
@@ -63,9 +77,9 @@ export class Character implements CharSheet {
 
     for (let i = 0; i < simulations; i++) {
       const attack = this.randomAttack(targetAc, isLargeTarget);
-      if (attack.isHit) {
+      if (attack.isHit && attack.damage) {
         hits++;
-        damageSum += attack.damage;
+        damageSum += attack.damage.sum;
         if (attack.isCrit) crits++;
       }
       lastAttack = attack;
@@ -97,6 +111,8 @@ export class Character implements CharSheet {
       name: this.name,
       charClass: this.charClass,
       level: this.level,
+      hp: this.hp,
+      ac: this.ac,
       toHitBonus: this.toHitBonus,
       damageBonus: this.damageBonus,
       // avoid nested JSON encoding
@@ -111,6 +127,8 @@ export class Character implements CharSheet {
       charSheet.name,
       charSheet.charClass,
       charSheet.level,
+      charSheet.hp,
+      charSheet.ac,
       charSheet.toHitBonus,
       charSheet.damageBonus,
       new Weapon(
@@ -126,6 +144,8 @@ export class Character implements CharSheet {
       uuid ? uuid : null,
       "",
       CharClasses.fighter,
+      0,
+      0,
       0,
       0,
       0,

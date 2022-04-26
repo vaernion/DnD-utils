@@ -6,6 +6,8 @@ export enum CharEditType {
   SET_CHAR_NAME = "charName",
   SET_CHAR_CLASS = "charClass",
   SET_CHAR_LEVEL = "charLvl",
+  SET_CHAR_HP = "charHp",
+  SET_CHAR_AC = "charAc",
   SET_CHAR_TOHIT_BONUS = "charToHitBonus",
   SET_CHAR_DAMAGE_BONUS = "charDmgBonus",
   SET_WEAPON_NAME = "wpnName",
@@ -23,6 +25,14 @@ interface SetCharClass {
 }
 interface SetCharLevel {
   type: CharEditType.SET_CHAR_LEVEL;
+  value: number;
+}
+interface SetCharHp {
+  type: CharEditType.SET_CHAR_HP;
+  value: number;
+}
+interface SetCharAc {
+  type: CharEditType.SET_CHAR_AC;
   value: number;
 }
 interface SetCharToHit {
@@ -50,6 +60,8 @@ export type CharEditAction =
   | SetCharName
   | SetCharClass
   | SetCharLevel
+  | SetCharHp
+  | SetCharAc
   | SetCharToHit
   | SetCharDmg
   | SetWeaponName
@@ -67,6 +79,10 @@ export function charEditReducer(
       return { ...state, weapon: { ...state.weapon }, charClass: action.value };
     case CharEditType.SET_CHAR_LEVEL:
       return { ...state, weapon: { ...state.weapon }, level: action.value };
+    case CharEditType.SET_CHAR_HP:
+      return { ...state, weapon: { ...state.weapon }, hp: action.value };
+    case CharEditType.SET_CHAR_AC:
+      return { ...state, weapon: { ...state.weapon }, ac: action.value };
     case CharEditType.SET_CHAR_TOHIT_BONUS:
       return {
         ...state,

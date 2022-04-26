@@ -14,6 +14,9 @@ Created to settle comparisons and have fun exploring possibilities for character
 | Persist char(s)       | serialize char/weapon in localstorage          | :heavy_check_mark: |
 | GUI: compare chars    |                                                | :heavy_check_mark: |
 | Character equipment   | char should dynamically parse affected stats   |                    |
-| Char buffs            | spells, potions                                |                    |
-| round based combat    |                                                |                    |
-| autobattler           | attack info, hp, component w/ scrolling output |                    |
+| Char buffs            |                                                |                    |
+| Char conumables       | potions                                        |                    |
+| Char abilities        |                                                |                    |
+| round based combat    |                                                | :heavy_check_mark: |
+| autobattler           | attack info, hp, component w/ scrolling output | :heavy_check_mark: |
+| autobattler tourney   | randomly selected monsters of different tiers  |                    |

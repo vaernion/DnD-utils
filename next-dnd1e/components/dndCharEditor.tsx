@@ -45,7 +45,12 @@ export const CharEditor: FC<Props> = ({ charSheet, readOnly = false }) => {
         : e.currentTarget.value;
 
     // prevent negative values
-    if (typeof editValue === "number" && editValue < 0) editValue = 0;
+    if (
+      typeof editValue === "number" &&
+      e.currentTarget.name !== CharEditType.SET_CHAR_AC &&
+      editValue < 0
+    )
+      editValue = 0;
 
     dispatch({
       type: CharStoreType.EDIT_CHAR,
@@ -135,8 +140,34 @@ export const CharEditor: FC<Props> = ({ charSheet, readOnly = false }) => {
               style={{ width: "3rem" }}
             />
           </span>
+        </div>
 
-          <span>thac0: {character.thac0}</span>
+        <div>
+          <span>
+            <label htmlFor={CharEditType.SET_CHAR_HP}>hp: </label>
+            <input
+              name={CharEditType.SET_CHAR_HP}
+              type="number"
+              value={character.hp}
+              onChange={handleChange}
+              disabled={readOnly}
+              style={{ width: "3rem" }}
+            />
+          </span>
+
+          <span>
+            <label htmlFor={CharEditType.SET_CHAR_AC}>ac: </label>
+            <input
+              name={CharEditType.SET_CHAR_AC}
+              type="number"
+              value={character.ac}
+              onChange={handleChange}
+              disabled={readOnly}
+              style={{ width: "3rem" }}
+            />
+          </span>
+
+          <span> thac0: {character.thac0}</span>
         </div>
 
         <div>
@@ -236,7 +267,12 @@ export const CharEditor: FC<Props> = ({ charSheet, readOnly = false }) => {
           <Link
             href={{ pathname: "/damage", query: { charId: character.uuid } }}
           >
-            <a>Damage stats</a>
+            <a>Damage</a>
+          </Link>
+          <Link
+            href={{ pathname: "/battle", query: { charId: character.uuid } }}
+          >
+            <a>Autobattle</a>
           </Link>
           <button onClick={showDeleteDialog} disabled={readOnly}>
             Delete

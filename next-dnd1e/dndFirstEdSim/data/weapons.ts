@@ -4,6 +4,9 @@ export enum WeaponTypes {
   longsword = "Longsword",
   shortsword = "Shortsword",
   twohanded = "Two-Handed Sword",
+  battleaxe = "Battle Axe",
+  morningstar = "Morning Star",
+  lucerne = "Lucerne hammer",
   fist = "Fist",
   superMonkFist = "SuperMonkFist",
 }
@@ -32,6 +35,21 @@ export const weapons: Weapons = {
     diceStringSM: "1d10",
     diceStringL: "3d6",
     acAdjustments: [2, 2, 2, 2, 3, 3, 3, 1, 0] as const,
+  },
+  [WeaponTypes.battleaxe]: {
+    diceStringSM: "1d8",
+    diceStringL: "1d8",
+    acAdjustments: [-3, -2, -1, -1, 0, 0, 1, 1, 2] as const,
+  },
+  [WeaponTypes.morningstar]: {
+    diceStringSM: "2d4",
+    diceStringL: "1d6+1",
+    acAdjustments: [0, 1, 1, 1, 1, 1, 1, 2, 2] as const,
+  },
+  [WeaponTypes.lucerne]: {
+    diceStringSM: "2d4",
+    diceStringL: "1d6",
+    acAdjustments: [1, 1, 2, 2, 2, 1, 1, 0, 0] as const,
   },
   [WeaponTypes.fist]: {
     diceStringSM: "1d2",

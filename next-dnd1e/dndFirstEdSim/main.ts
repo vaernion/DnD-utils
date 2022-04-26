@@ -11,6 +11,8 @@ const emeric = new Character(
   "Emeric spec",
   CharClasses.fighter,
   7,
+  40,
+  -2,
   1,
   2,
   emericSword
@@ -34,6 +36,8 @@ const dunston = new Character(
   "Dunston spec 18/00",
   CharClasses.fighter,
   7,
+  30,
+  -1,
   4,
   8,
   dunstonSword
@@ -57,6 +61,8 @@ const xavier = new Character(
   "Xavier spec 18/00",
   CharClasses.fighter,
   7,
+  30,
+  -2,
   4,
   8,
   xavierSword
@@ -114,6 +120,8 @@ const superMonk = new Character(
   "Supermonk",
   CharClasses.monk,
   17,
+  60,
+  2,
   0,
   0,
   superMonkFist
@@ -141,7 +149,8 @@ const superFighter = new Character(
   "Superfighter spec",
   CharClasses.fighter,
   17,
-
+  80,
+  -4,
   1 + 3,
   1 + 6,
   superFighterSword
